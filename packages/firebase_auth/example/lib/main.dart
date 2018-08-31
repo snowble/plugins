@@ -5,8 +5,8 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
 final FirebaseAuth _auth = FirebaseAuth.instance;
@@ -41,6 +41,10 @@ class _MyHomePageState extends State<MyHomePage> {
   String verificationId;
   final String testSmsCode = '888888';
   final String testPhoneNumber = '+1 408-555-6969';
+  final String testEmail = 'leonmansweet@gmail.com';
+  final String testDynamicLink =
+      'https://flutter-demo-apps.firebaseapp.com/finishSignUp';
+  final String testIOSBundleId = 'io.flutter.plugins.firebaseauthexample';
 
   Future<String> _testSignInAnonymously() async {
     final FirebaseUser user = await _auth.signInAnonymously();
@@ -137,6 +141,20 @@ class _MyHomePageState extends State<MyHomePage> {
     return 'signInWithPhoneNumber succeeded: $user';
   }
 
+  Future<String> _testSendSignInLinkToEmail() async {
+    final ActionCodeSettings settings = ActionCodeSettings()
+      ..url = testDynamicLink
+      ..handleCodeInApp = true
+      ..iOSBundleId = testIOSBundleId
+      ..androidPackageName = 'io.flutter.plugins.firebaseauthexample'
+      ..installIfNotAvailable = true
+      ..minimumVersion = '0';
+
+    await _auth.sendSignInLinkToEmail(settings: settings, email: testEmail);
+
+    return 'Email sent to: $testEmail';
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -187,6 +205,13 @@ class _MyHomePageState extends State<MyHomePage> {
                         _testSignInWithPhoneNumber(_smsCodeController.text);
                   });
                 }
+              }),
+          MaterialButton(
+              child: const Text('Test sendSignInLinkToEmail'),
+              onPressed: () {
+                setState(() {
+                  _message = _testSendSignInLinkToEmail();
+                });
               }),
           FutureBuilder<String>(
               future: _message,

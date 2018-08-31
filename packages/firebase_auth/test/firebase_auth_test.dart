@@ -21,6 +21,10 @@ const String kMockPhoneNumber = '5555555555';
 const String kMockVerificationId = '12345';
 const String kMockSmsCode = '123456';
 const String kMockLanguage = 'en';
+const String kMockEmailUrl = 'http://example.com';
+const String kMockIOSBundleId = 'io.flutter.plugins.firebaseauthexample';
+const String kMockAndroidPackageName = 'io.flutter.plugins.firebaseauthexample';
+const String kMockMinimumVersion = '0';
 
 void main() {
   group('$FirebaseAuth', () {
@@ -51,6 +55,9 @@ void main() {
             return List<String>(0);
             break;
           case "verifyPhoneNumber":
+            return null;
+            break;
+          case "sendSignInLinkToEmail":
             return null;
             break;
           default:
@@ -468,6 +475,30 @@ void main() {
           ),
         ],
       );
+    });
+
+    test('sendSignInLinkToEmail', () async {
+      final ActionCodeSettings mockSettings = ActionCodeSettings()
+        ..url = kMockEmailUrl
+        ..handleCodeInApp = true
+        ..iOSBundleId = kMockIOSBundleId
+        ..androidPackageName = kMockAndroidPackageName
+        ..installIfNotAvailable = true
+        ..minimumVersion = kMockMinimumVersion;
+
+      await auth.sendSignInLinkToEmail(
+          settings: mockSettings, email: kMockEmail);
+      expect(log, <Matcher>[
+        isMethodCall('sendSignInLinkToEmail', arguments: <String, dynamic>{
+          'email': kMockEmail,
+          'url': kMockEmailUrl,
+          'handleCodeInApp': true,
+          'iOSBundleId': kMockIOSBundleId,
+          'androidPackageName': kMockAndroidPackageName,
+          'installIfNotAvailable': true,
+          'minimumVersion': kMockMinimumVersion,
+        })
+      ]);
     });
   });
 }

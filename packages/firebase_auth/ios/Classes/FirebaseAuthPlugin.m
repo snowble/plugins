@@ -136,6 +136,30 @@ int nextHandle = 0;
                          completion:^(FIRAuthDataResult *dataResult, NSError *error) {
                            [self sendResult:result forUser:dataResult.user error:error];
                          }];
+  } else if ([@"sendSignInLinkToEmail" isEqualToString:call.method]) {
+    NSString *email = call.arguments[@"email"];
+    NSString *url = call.arguments[@"url"];
+    NSNumber *handleCodeInAppNumber = call.arguments[@"handleCodeInApp"];
+    BOOL handleCodeInApp = handleCodeInAppNumber.boolValue;
+    NSString *iOSBundleId = call.arguments[@"iOSBundleId"];
+    NSString *androidPackageName = call.arguments[@"androidPackageName"];
+    NSNumber *installIfNotAvailableNumber = call.arguments[@"installIfNotAvailable"];
+    BOOL installIfNotAvailable = installIfNotAvailableNumber.boolValue;
+    NSString *minimumVersion = call.arguments[@"minimumVersion"];
+
+    FIRActionCodeSettings *actionCodeSettings = [[FIRActionCodeSettings alloc] init];
+    [actionCodeSettings setURL:[NSURL URLWithString:url]];
+    actionCodeSettings.handleCodeInApp = handleCodeInApp;
+    [actionCodeSettings setIOSBundleID:iOSBundleId];
+    [actionCodeSettings setAndroidPackageName:androidPackageName
+                        installIfNotAvailable:installIfNotAvailable
+                               minimumVersion:minimumVersion];
+
+    [[FIRAuth auth] sendSignInLinkToEmail:email
+                       actionCodeSettings:actionCodeSettings
+                               completion:^(NSError *_Nullable error) {
+                                 [self sendResult:result forUser:nil error:error];
+                               }];
   } else if ([@"signOut" isEqualToString:call.method]) {
     NSError *signOutError;
     BOOL status = [[FIRAuth auth] signOut:&signOutError];

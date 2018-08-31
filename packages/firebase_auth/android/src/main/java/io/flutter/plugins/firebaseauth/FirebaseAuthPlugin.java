@@ -96,6 +96,9 @@ public class FirebaseAuthPlugin implements MethodCallHandler {
       case "signInWithTwitter":
         handleSignInWithTwitter(call, result);
         break;
+      case "sendSignInLinkToEmail":
+        handleSendSignInLinkToEmail(call, result);
+        break;
       case "signOut":
         handleSignOut(call, result);
         break;
@@ -397,6 +400,28 @@ public class FirebaseAuthPlugin implements MethodCallHandler {
     firebaseAuth
         .signInWithCustomToken(token)
         .addOnCompleteListener(new SignInCompleteListener(result));
+  }
+
+  private void handleSendSignInLinkToEmail(MethodCall call, final Result result) {
+    String email = call.argument("email");
+    String url = call.argument("url");
+    boolean handleCodeInApp = call.argument("handleCodeInApp");
+    String iOSBundleId = call.argument("iOSBundleId");
+    String androidPackageName = call.argument("androidPackageName");
+    boolean installIfNotAvailable = call.argument("installIfNotAvailable");
+    String minimumVersion = call.argument("minimumVersion");
+
+    ActionCodeSettings actionCodeSettings =
+        ActionCodeSettings.newBuilder()
+            .setUrl(url)
+            .setHandleCodeInApp(handleCodeInApp)
+            .setIOSBundleId(iOSBundleId)
+            .setAndroidPackageName(androidPackageName, installIfNotAvailable, minimumVersion)
+            .build();
+
+    firebaseAuth
+        .sendSignInLinkToEmail(email, actionCodeSettings)
+        .addOnCompleteListener(new TaskVoidCompleteListener(result));
   }
 
   private void handleSignOut(MethodCall call, final Result result) {

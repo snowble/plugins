@@ -104,7 +104,29 @@ class FirebaseUser extends UserInfo {
 class AuthException implements Exception {
   final String code;
   final String message;
+
   const AuthException(this.code, this.message);
+}
+
+/// Settings used when generating a link to sign in with email.
+class ActionCodeSettings {
+  final Map<String, dynamic> _data = <String, dynamic>{};
+
+  Map<String, dynamic> get data => _data;
+
+  set url(String url) => _data["url"] = url;
+
+  set handleCodeInApp(bool handle) => _data["handleCodeInApp"] = handle;
+
+  set iOSBundleId(String bundleId) => _data["iOSBundleId"] = bundleId;
+
+  set androidPackageName(String package) =>
+      _data["androidPackageName"] = package;
+
+  set installIfNotAvailable(bool install) =>
+      _data["installIfNotAvailable"] = install;
+
+  set minimumVersion(String version) => _data["minimumVersion"] = version;
 }
 
 typedef void PhoneVerificationCompleted(FirebaseUser firebaseUser);
@@ -331,6 +353,17 @@ class FirebaseAuth {
     );
     final FirebaseUser currentUser = FirebaseUser._(data);
     return currentUser;
+  }
+
+  Future<void> sendSignInLinkToEmail({
+    @required ActionCodeSettings settings,
+    @required String email,
+  }) async {
+    assert(settings != null);
+    assert(email != null);
+    final Map<String, dynamic> args = <String, dynamic>{'email': email}
+      ..addAll(settings.data);
+    return await channel.invokeMethod('sendSignInLinkToEmail', args);
   }
 
   Future<void> signOut() async {

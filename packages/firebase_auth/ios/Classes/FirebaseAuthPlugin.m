@@ -160,6 +160,10 @@ int nextHandle = 0;
                                completion:^(NSError *_Nullable error) {
                                  [self sendResult:result forUser:nil error:error];
                                }];
+  } else if ([@"isSignInWithEmailLink" isEqualToString:call.method]) {
+    NSString *link = call.arguments[@"link"];
+    BOOL isSignInLink = [[FIRAuth auth] isSignInWithEmailLink:link];
+    result([NSNumber numberWithBool:isSignInLink]);
   } else if ([@"signOut" isEqualToString:call.method]) {
     NSError *signOutError;
     BOOL status = [[FIRAuth auth] signOut:&signOutError];

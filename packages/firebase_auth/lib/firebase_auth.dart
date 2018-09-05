@@ -366,6 +366,16 @@ class FirebaseAuth {
     return await channel.invokeMethod('sendSignInLinkToEmail', args);
   }
 
+  Future<bool> isSignInWithEmailLink(Uri link) async {
+    assert(link != null);
+    return await channel.invokeMethod(
+      'isSignInWithEmailLink',
+      <String, String>{
+        'link': link.toString(),
+      },
+    );
+  }
+
   Future<void> signOut() async {
     return await channel.invokeMethod("signOut");
   }

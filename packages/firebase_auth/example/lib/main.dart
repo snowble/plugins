@@ -6,6 +6,7 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
@@ -155,6 +156,22 @@ class _MyHomePageState extends State<MyHomePage> {
     return 'Email sent to: $testEmail';
   }
 
+  Future<String> _testIsSignInWithEmailLink() async {
+    final PendingDynamicLinkData data =
+        await FirebaseDynamicLinks.instance.retrieveDynamicLink();
+    final Uri link = data?.link;
+
+    if (link != null) {
+      if (await _auth.isSignInWithEmailLink(link)) {
+        return 'This is a sign in with email link';
+      } else {
+        return 'This is not a sign in with email link';
+      }
+    } else {
+      return 'The app was not launched with a link';
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -211,6 +228,13 @@ class _MyHomePageState extends State<MyHomePage> {
               onPressed: () {
                 setState(() {
                   _message = _testSendSignInLinkToEmail();
+                });
+              }),
+          MaterialButton(
+              child: const Text('Test isSignInWithEmailLink'),
+              onPressed: () {
+                setState(() {
+                  _message = _testIsSignInWithEmailLink();
                 });
               }),
           FutureBuilder<String>(

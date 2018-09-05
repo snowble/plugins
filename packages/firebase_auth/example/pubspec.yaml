@@ -8,6 +8,7 @@ dependencies:
   firebase_auth:
     path: ../
   google_sign_in: ^3.0.4
+  firebase_dynamic_links: ^0.1.0
 
 flutter:
   uses-material-design: true

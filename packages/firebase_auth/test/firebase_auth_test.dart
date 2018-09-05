@@ -25,6 +25,7 @@ const String kMockEmailUrl = 'http://example.com';
 const String kMockIOSBundleId = 'io.flutter.plugins.firebaseauthexample';
 const String kMockAndroidPackageName = 'io.flutter.plugins.firebaseauthexample';
 const String kMockMinimumVersion = '0';
+const String kMockEmailLink = 'http://example.com';
 
 void main() {
   group('$FirebaseAuth', () {
@@ -59,6 +60,9 @@ void main() {
             break;
           case "sendSignInLinkToEmail":
             return null;
+            break;
+          case "isSignInWithEmailLink":
+            return true;
             break;
           default:
             return mockFirebaseUser();
@@ -498,6 +502,17 @@ void main() {
           'installIfNotAvailable': true,
           'minimumVersion': kMockMinimumVersion,
         })
+      ]);
+    });
+
+    test('isSignInWithEmailLink', () async {
+      final Uri link = Uri.parse(kMockEmailLink);
+
+      final bool isSignInWithEmailLink = await auth.isSignInWithEmailLink(link);
+      expect(isSignInWithEmailLink, true);
+      expect(log, <Matcher>[
+        isMethodCall('isSignInWithEmailLink',
+            arguments: <String, String>{'link': kMockEmailLink})
       ]);
     });
   });

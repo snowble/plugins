@@ -102,6 +102,9 @@ public class FirebaseAuthPlugin implements MethodCallHandler {
       case "isSignInWithEmailLink":
         handleIsSignInWithEmailLink(call, result);
         break;
+      case "signInWithEmailLink":
+        handleSignInWithEmailLink(call, result);
+        break;
       case "signOut":
         handleSignOut(call, result);
         break;
@@ -432,6 +435,15 @@ public class FirebaseAuthPlugin implements MethodCallHandler {
     String link = arguments.get("link");
 
     result.success(firebaseAuth.isSignInWithEmailLink(link));
+  }
+
+  private void handleSignInWithEmailLink(MethodCall call, final Result result) {
+    String email = call.argument("email");
+    String link = call.argument("link");
+
+    firebaseAuth
+        .signInWithEmailLink(email, link)
+        .addOnCompleteListener(new SignInCompleteListener(result));
   }
 
   private void handleSignOut(MethodCall call, final Result result) {

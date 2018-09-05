@@ -515,6 +515,20 @@ void main() {
             arguments: <String, String>{'link': kMockEmailLink})
       ]);
     });
+
+    test('signInWithEmailLink', () async {
+      final Uri link = Uri.parse(kMockEmailLink);
+
+      final FirebaseUser user =
+          await auth.signInWithEmailLink(email: kMockEmail, link: link);
+      verifyUser(user);
+      expect(log, <Matcher>[
+        isMethodCall('signInWithEmailLink', arguments: <String, String>{
+          'email': kMockEmail,
+          'link': kMockEmailLink,
+        })
+      ]);
+    });
   });
 }
 

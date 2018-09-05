@@ -156,14 +156,19 @@ class _MyHomePageState extends State<MyHomePage> {
     return 'Email sent to: $testEmail';
   }
 
-  Future<String> _testIsSignInWithEmailLink() async {
+  Future<String> _testSignInWithEmailLink() async {
     final PendingDynamicLinkData data =
         await FirebaseDynamicLinks.instance.retrieveDynamicLink();
     final Uri link = data?.link;
 
     if (link != null) {
       if (await _auth.isSignInWithEmailLink(link)) {
-        return 'This is a sign in with email link';
+        final FirebaseUser user =
+            await _auth.signInWithEmailLink(email: testEmail, link: link);
+        final FirebaseUser currentUser = await _auth.currentUser();
+        assert(user.uid == currentUser.uid);
+
+        return 'signInWithEmailLink succeeded: $user';
       } else {
         return 'This is not a sign in with email link';
       }
@@ -231,10 +236,10 @@ class _MyHomePageState extends State<MyHomePage> {
                 });
               }),
           MaterialButton(
-              child: const Text('Test isSignInWithEmailLink'),
+              child: const Text('Test signInWithEmailLink'),
               onPressed: () {
                 setState(() {
-                  _message = _testIsSignInWithEmailLink();
+                  _message = _testSignInWithEmailLink();
                 });
               }),
           FutureBuilder<String>(

@@ -164,6 +164,14 @@ int nextHandle = 0;
     NSString *link = call.arguments[@"link"];
     BOOL isSignInLink = [[FIRAuth auth] isSignInWithEmailLink:link];
     result([NSNumber numberWithBool:isSignInLink]);
+  } else if ([@"signInWithEmailLink" isEqualToString:call.method]) {
+    NSString *email = call.arguments[@"email"];
+    NSString *link = call.arguments[@"link"];
+    [[FIRAuth auth] signInWithEmail:email
+                               link:link
+                         completion:^(FIRUser *user, NSError *error) {
+                           [self sendResult:result forUser:user error:error];
+                         }];
   } else if ([@"signOut" isEqualToString:call.method]) {
     NSError *signOutError;
     BOOL status = [[FIRAuth auth] signOut:&signOutError];

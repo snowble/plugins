@@ -376,6 +376,23 @@ class FirebaseAuth {
     );
   }
 
+  Future<FirebaseUser> signInWithEmailLink({
+    @required String email,
+    @required Uri link,
+  }) async {
+    assert(email != null);
+    assert(link != null);
+    final Map<dynamic, dynamic> data = await channel.invokeMethod(
+      'signInWithEmailLink',
+      <String, String>{
+        'email': email,
+        'link': link.toString(),
+      },
+    );
+    final FirebaseUser currentUser = new FirebaseUser._(data);
+    return currentUser;
+  }
+
   Future<void> signOut() async {
     return await channel.invokeMethod("signOut");
   }

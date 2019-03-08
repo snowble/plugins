@@ -214,7 +214,8 @@ public class CameraPlugin implements MethodCallHandler {
       case "startVideoRecording":
         {
           final String filePath = call.argument("filePath");
-          camera.startVideoRecording(filePath, result);
+          Double captureRateFps = call.argument("captureRateFps");
+          camera.startVideoRecording(filePath, captureRateFps, result);
           break;
         }
       case "stopVideoRecording":
@@ -462,7 +463,8 @@ public class CameraPlugin implements MethodCallHandler {
               new CompareSizesByArea());
     }
 
-    private void prepareMediaRecorder(String outputFilePath) throws IOException {
+    private void prepareMediaRecorder(String outputFilePath, @Nullable Double captureRateFps)
+        throws IOException {
       if (mediaRecorder != null) {
         mediaRecorder.release();
       }
@@ -474,6 +476,9 @@ public class CameraPlugin implements MethodCallHandler {
       mediaRecorder.setVideoEncoder(MediaRecorder.VideoEncoder.H264);
       mediaRecorder.setVideoEncodingBitRate(1024 * 1000);
       mediaRecorder.setAudioSamplingRate(16000);
+      if (captureRateFps != null) {
+        mediaRecorder.setCaptureRate(captureRateFps);
+      }
       mediaRecorder.setVideoFrameRate(27);
       mediaRecorder.setVideoSize(videoSize.getWidth(), videoSize.getHeight());
       mediaRecorder.setOutputFile(outputFilePath);
@@ -640,7 +645,8 @@ public class CameraPlugin implements MethodCallHandler {
       }
     }
 
-    private void startVideoRecording(String filePath, @NonNull final Result result) {
+    private void startVideoRecording(String filePath, @Nullable Double captureRateFps,
+        @NonNull final Result result) {
       if (cameraDevice == null) {
         result.error("configureFailed", "Camera was closed during configuration.", null);
         return;
@@ -654,7 +660,7 @@ public class CameraPlugin implements MethodCallHandler {
       }
       try {
         closeCaptureSession();
-        prepareMediaRecorder(filePath);
+        prepareMediaRecorder(filePath, captureRateFps);
 
         recordingVideo = true;
 

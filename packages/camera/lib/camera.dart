@@ -3,6 +3,7 @@
 // found in the LICENSE file.
 
 import 'dart:async';
+import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:flutter/foundation.dart';
@@ -414,7 +415,8 @@ class CameraController extends ValueNotifier<CameraValue> {
   /// The file can be read as soon as [stopVideoRecording] returns.
   ///
   /// Throws a [CameraException] if the capture fails.
-  Future<void> startVideoRecording(String filePath) async {
+  Future<void> startVideoRecording(String filePath,
+      {double captureRateFps}) async {
     if (!value.isInitialized || _isDisposed) {
       throw CameraException(
         'Uninitialized CameraController',
@@ -435,9 +437,20 @@ class CameraController extends ValueNotifier<CameraValue> {
     }
 
     try {
-      await _channel.invokeMethod<void>(
+      final dynamic args = <String, dynamic>{
+        'textureId': _textureId,
+        'filePath': filePath
+      };
+      if (captureRateFps != null) {
+        if (Platform.isIOS) {
+          throw UnsupportedError('captureRateFps is Android only.');
+        }
+        args['captureRateFps'] = captureRateFps;
+      }
+
+    await _channel.invokeMethod<void>(
         'startVideoRecording',
-        <String, dynamic>{'textureId': _textureId, 'filePath': filePath},
+        args,
       );
       value = value.copyWith(isRecordingVideo: true);
     } on PlatformException catch (e) {

@@ -154,6 +154,16 @@ class _CameraExampleHomeState extends State<CameraExampleHome> {
               : null,
         ),
         IconButton(
+          icon: const Icon(Icons.shutter_speed),
+          color: Colors.blue,
+          onPressed: controller != null &&
+                  controller.value.isInitialized &&
+                  !controller.value.isRecordingVideo &&
+                  Platform.isAndroid
+              ? onTimeLapsePressed
+              : null,
+        ),
+        IconButton(
           icon: const Icon(Icons.stop),
           color: Colors.red,
           onPressed: controller != null &&
@@ -237,6 +247,13 @@ class _CameraExampleHomeState extends State<CameraExampleHome> {
     });
   }
 
+  void onTimeLapsePressed() {
+    startVideoRecording(0.6).then((String filePath) {
+      if (mounted) setState(() {});
+      if (filePath != null) showInSnackBar('Saving video to $filePath');
+    });
+  }
+
   void onVideoRecordButtonPressed() {
     startVideoRecording().then((String filePath) {
       if (mounted) setState(() {});
@@ -251,7 +268,7 @@ class _CameraExampleHomeState extends State<CameraExampleHome> {
     });
   }
 
-  Future<String> startVideoRecording() async {
+  Future<String> startVideoRecording([double captureRateFps]) async {
     if (!controller.value.isInitialized) {
       showInSnackBar('Error: select a camera first.');
       return null;
@@ -269,7 +286,8 @@ class _CameraExampleHomeState extends State<CameraExampleHome> {
 
     try {
       videoPath = filePath;
-      await controller.startVideoRecording(filePath);
+      await controller.startVideoRecording(filePath,
+          captureRateFps: captureRateFps);
     } on CameraException catch (e) {
       _showCameraException(e);
       return null;
